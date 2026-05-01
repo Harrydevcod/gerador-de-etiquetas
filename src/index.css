@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg:  #f1f3f8;
+  --bg2: #ffffff;
+  --bg3: #e8eaf2;
+  --txt:  #1a1b2e;
+  --txt2: #4a4c6a;
+  --txt3: #8a8ca8;
+  --bdr:  #dde0f0;
+  --bdr2: #c4c8e0;
+  --inp:  #ffffff;
+  --acc:  #1a6fbd;
+  --acc2: #e67e22;
+}
+
+.dark {
+  --bg:  #0f1117;
+  --bg2: #191c27;
+  --bg3: #222535;
+  --txt:  #e4e6f5;
+  --txt2: #9092b0;
+  --txt3: #50527a;
+  --bdr:  #2c2f48;
+  --bdr2: #3c4060;
+  --inp:  #191c27;
+  --acc:  #3a8fd4;
+  --acc2: #e67e22;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--txt);
+  font-family: 'Barlow', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root { min-height: 100svh; }
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+@media print {
+  /* Fallback: Ctrl+P direto mostra a grelha normal */
+  body { background: white !important; }
+  .no-print { display: none !important; }
+
+  /* Impressão controlada via botão Imprimir */
+  body[data-printing] * { visibility: hidden !important; }
+  body[data-printing] #print-area {
+    display: block !important;
+    visibility: visible !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: white !important;
+    z-index: 99999 !important;
+  }
+  body[data-printing] #print-area * { visibility: visible !important; }
+
+  @page { margin: 0; }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-toast-in {
+  animation: toast-in 0.18s ease-out both;
+}
+
+.scrollbar-none { scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
