@@ -19,6 +19,7 @@ import { renderLabel } from './renderers';
 import { ModelSizeBar } from './components/toolbar/ModelSizeBar';
 import { useToast } from './lib/toast';
 import { ShortcutsModal } from './components/modais/ShortcutsModal';
+import { UpdateBanner } from './components/UpdateBanner';
 import { applyPriceOp } from './components/modais/BulkEditModal';
 import { rbn } from './renderers/helpers';
 import type { Label } from './types/label';
@@ -427,6 +428,8 @@ export default function App() {
       )}
 
       {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
+
+      <UpdateBanner />
 
       {/* Print area — hidden on screen, visible only during controlled print */}
       <div id="print-area" aria-hidden="true" style={{ display: 'none' }}>

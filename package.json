@@ -67,7 +67,12 @@
       "createStartMenuShortcut": true,
       "shortcutName": "NOVA-ERP Etiquetas"
     },
-    "publish": null
+    "publish": {
+      "provider": "github",
+      "owner": "SEU-USUARIO-GITHUB",
+      "repo": "etiquetas-releases",
+      "private": false
+    }
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -75,6 +80,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@supabase/supabase-js": "^2.105.1",
     "docx": "^9.6.1",
+    "electron-updater": "^6.8.3",
     "exceljs": "^4.4.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
