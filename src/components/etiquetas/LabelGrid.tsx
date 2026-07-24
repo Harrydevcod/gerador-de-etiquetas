@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { Label } from '../../types/label';
 import type { AppConfig } from '../../types/config';
 import { renderLabel } from '../../renderers';
@@ -62,6 +63,14 @@ function EmptyState({ onAddNew, onImport }: { onAddNew?: () => void; onImport?: 
 export function LabelGrid({ labels, cfg, selectedIds, selectionMode, searchQuery, onEdit, onDuplicate, onRemove, onToggleSelect, onReorder, onAddNew, onImport }: Props) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
+  const ribbonHtml = useMemo(() => rbn(cfg), [cfg]);
+  // HTML das etiquetas (com geração de barcode) só recalcula quando as próprias
+  // etiquetas ou a config mudam — não a cada toggle de seleção/pesquisa.
+  const rendered = useMemo(
+    () => labels.map(l => ({ id: l.id, html: renderLabel(l, cfg.selSize, cfg) })),
+    [labels, cfg]
+  );
+
   function handleDragEnd(e: DragEndEvent) {
     const { active, over } = e;
     if (over && active.id !== over.id) {
@@ -83,25 +92,24 @@ export function LabelGrid({ labels, cfg, selectedIds, selectionMode, searchQuery
     return <EmptyState onAddNew={onAddNew} onImport={onImport} />;
   }
 
-  const ribbonHtml = rbn(cfg);
-  const ids = labels.map(l => l.id);
+  const ids = rendered.map(r => r.id);
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={ids} strategy={rectSortingStrategy}>
         <div id="labels-panel" className="flex flex-wrap gap-3 p-4">
-          {labels.map(l => (
+          {rendered.map(({ id, html }) => (
             <LabelWrapper
-              key={l.id}
-              id={l.id}
-              html={renderLabel(l, cfg.selSize, cfg)}
+              key={id}
+              id={id}
+              html={html}
               ribbon={ribbonHtml}
-              selected={selectedIds.has(l.id)}
+              selected={selectedIds.has(id)}
               selectionMode={selectionMode}
-              onEdit={() => onEdit(l.id)}
-              onDuplicate={() => onDuplicate(l.id)}
-              onRemove={() => onRemove(l.id)}
-              onSelect={() => onToggleSelect(l.id)}
+              onEdit={onEdit}
+              onDuplicate={onDuplicate}
+              onRemove={onRemove}
+              onSelect={onToggleSelect}
             />
           ))}
         </div>

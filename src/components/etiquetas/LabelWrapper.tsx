@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Pencil, Copy, X, GripVertical } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -8,13 +9,15 @@ interface Props {
   ribbon: string;
   selected?: boolean;
   selectionMode?: boolean;
-  onEdit: () => void;
-  onDuplicate: () => void;
-  onRemove: () => void;
-  onSelect?: () => void;
+  // Recebem o id — assim as props são estáveis e o React.memo evita
+  // re-renderizar (e re-parsear o HTML) etiquetas cujo estado não mudou.
+  onEdit: (id: string) => void;
+  onDuplicate: (id: string) => void;
+  onRemove: (id: string) => void;
+  onSelect?: (id: string) => void;
 }
 
-export function LabelWrapper({ id, html, ribbon, selected, selectionMode, onEdit, onDuplicate, onRemove, onSelect }: Props) {
+export const LabelWrapper = memo(function LabelWrapper({ id, html, ribbon, selected, selectionMode, onEdit, onDuplicate, onRemove, onSelect }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   const dragStyle = {
@@ -26,7 +29,7 @@ export function LabelWrapper({ id, html, ribbon, selected, selectionMode, onEdit
   };
 
   function handleClick() {
-    if (selectionMode && onSelect) onSelect();
+    if (selectionMode && onSelect) onSelect(id);
   }
 
   return (
@@ -49,13 +52,13 @@ export function LabelWrapper({ id, html, ribbon, selected, selectionMode, onEdit
 
           {/* action buttons */}
           <div className="absolute top-0 inset-x-0 flex justify-center gap-1 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-20 print:hidden">
-            <button onClick={e => { e.stopPropagation(); onEdit(); }} className="bg-white/95 hover:bg-white text-gray-700 rounded p-1 shadow" title="Editar">
+            <button onClick={e => { e.stopPropagation(); onEdit(id); }} className="bg-white/95 hover:bg-white text-gray-700 rounded p-1 shadow" title="Editar">
               <Pencil size={10} />
             </button>
-            <button onClick={e => { e.stopPropagation(); onDuplicate(); }} className="bg-white/95 hover:bg-white text-gray-700 rounded p-1 shadow" title="Duplicar">
+            <button onClick={e => { e.stopPropagation(); onDuplicate(id); }} className="bg-white/95 hover:bg-white text-gray-700 rounded p-1 shadow" title="Duplicar">
               <Copy size={10} />
             </button>
-            <button onClick={e => { e.stopPropagation(); onRemove(); }} className="bg-red-500 hover:bg-red-600 text-white rounded p-1 shadow" title="Remover">
+            <button onClick={e => { e.stopPropagation(); onRemove(id); }} className="bg-red-500 hover:bg-red-600 text-white rounded p-1 shadow" title="Remover">
               <X size={10} />
             </button>
           </div>
@@ -81,4 +84,4 @@ export function LabelWrapper({ id, html, ribbon, selected, selectionMode, onEdit
       )}
     </div>
   );
-}
+});
