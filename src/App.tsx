@@ -11,16 +11,14 @@ import { PreviewModal } from './components/modais/PreviewModal';
 import { PainelPersonalizar } from './components/personalizar/PainelPersonalizar';
 import { ImportExcel } from './components/importar/ImportExcel';
 import { LastSessionBanner } from './components/LastSessionBanner';
-import { exportExcel } from './lib/exportExcel';
-import { exportWord } from './lib/exportWord';
-import { exportCsv } from './lib/exportCsv';
-import { exportPdf } from './lib/exportPdf';
+import { useExport } from './hooks/useExport';
+import { usePrint } from './hooks/usePrint';
 import { renderLabel } from './renderers';
 import { ModelSizeBar } from './components/toolbar/ModelSizeBar';
 import { useToast } from './lib/toast';
 import { ShortcutsModal } from './components/modais/ShortcutsModal';
 import { UpdateBanner } from './components/UpdateBanner';
-import { applyPriceOp } from './components/modais/BulkEditModal';
+import { applyPriceOp } from './lib/priceOp';
 import { rbn } from './renderers/helpers';
 import type { Label } from './types/label';
 import type { ModelKey } from './types/config';
@@ -52,8 +50,9 @@ export default function App() {
   const [sortBy, setSortBy]           = useState<SortField>('createdAt');
   const [sortDir, setSortDir]         = useState<SortDir>('desc');
 
-  // Export loading
-  const [isLoading, setIsLoading]     = useState(false);
+  // Export (loading + handlers) e impressão controlada — extraídos para hooks
+  const { isLoading, exportToWord, exportToExcel, exportToCsv, exportToPdf } = useExport(labels, cfg);
+  const { printQueue, triggerPrint } = usePrint(cfg.printLandscape);
 
   // Selection
   const [selectionMode, setSelectionMode] = useState(false);
@@ -65,13 +64,10 @@ export default function App() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [previewLabels, setPreviewLabels] = useState<Label[]>([]);
 
-  // Print queue — set to trigger controlled print
-  const [printQueue, setPrintQueue] = useState<Label[] | null>(null);
-
   // Filtered + sorted labels
   const filteredLabels = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    let result = q
+    const result = q
       ? labels.filter(l =>
           l.name.toLowerCase().includes(q) ||
           l.brand.toLowerCase().includes(q) ||
@@ -82,7 +78,7 @@ export default function App() {
       : [...labels];
 
     result.sort((a, b) => {
-      let cmp = 0;
+      let cmp: number;
       if (sortBy === 'name')      cmp = a.name.localeCompare(b.name);
       else if (sortBy === 'price') cmp = a.price - b.price;
       else if (sortBy === 'section') cmp = a.section.localeCompare(b.section);
@@ -132,25 +128,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [undo, redo, toast, labels, filteredLabels, selectionMode]);
-
-  // Execute print after DOM updates with printQueue content
-  useEffect(() => {
-    if (printQueue === null) return;
-    const t = setTimeout(() => {
-      // Inject dynamic @page orientation
-      const styleEl = document.createElement('style');
-      styleEl.id = '__print-page__';
-      styleEl.textContent = `@page { size: A4 ${cfg.printLandscape ? 'landscape' : 'portrait'}; margin: 0; }`;
-      document.head.appendChild(styleEl);
-      document.body.setAttribute('data-printing', 'true');
-      window.print();
-      document.body.removeAttribute('data-printing');
-      document.head.removeChild(styleEl);
-      setPrintQueue(null);
-    }, 80);
-    return () => clearTimeout(t);
-  }, [printQueue]);
+  }, [undo, redo, toast, labels, filteredLabels, selectionMode, triggerPrint]);
 
   // ── Handlers ────────────────────────────────────────────────────────────
 
@@ -187,54 +165,6 @@ export default function App() {
   function handleImport(newLabels: Omit<Label, 'id' | 'createdAt'>[]) {
     newLabels.forEach(l => add(l));
     toast(`${newLabels.length} etiqueta${newLabels.length !== 1 ? 's' : ''} importada${newLabels.length !== 1 ? 's' : ''}`);
-  }
-
-  async function handleExportWord() {
-    setIsLoading(true);
-    try {
-      await exportWord(labels, cfg);
-      toast('Word exportado com sucesso');
-    } catch (e) {
-      toast('Erro ao gerar Word: ' + (e instanceof Error ? e.message : String(e)), 'error');
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleExportExcel() {
-    setIsLoading(true);
-    try {
-      await exportExcel(labels, cfg);
-      toast('Excel exportado com sucesso');
-    } catch (e) {
-      toast('Erro ao gerar Excel: ' + (e instanceof Error ? e.message : String(e)), 'error');
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleExportCsv() {
-    setIsLoading(true);
-    try {
-      await exportCsv(labels);
-      toast('CSV exportado com sucesso');
-    } catch (e) {
-      toast('Erro ao gerar CSV: ' + (e instanceof Error ? e.message : String(e)), 'error');
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleExportPdf() {
-    setIsLoading(true);
-    try {
-      await exportPdf(labels, cfg);
-      toast('PDF exportado com sucesso');
-    } catch (e) {
-      toast('Erro ao gerar PDF: ' + (e instanceof Error ? e.message : String(e)), 'error');
-    } finally {
-      setIsLoading(false);
-    }
   }
 
   // ── Selection ────────────────────────────────────────────────────────────
@@ -274,14 +204,18 @@ export default function App() {
     });
   }
 
-  function toggleSelectId(id: string) {
+  const toggleSelectId = useCallback((id: string) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  }
+  }, []);
+
+  const handleEdit = useCallback((id: string) => {
+    setEditTarget(labels.find(l => l.id === id) ?? null);
+  }, [labels]);
 
   const selectedList = labels.filter(l => selectedIds.has(l.id));
 
@@ -290,10 +224,6 @@ export default function App() {
   function openPreview(labelsToShow: Label[]) {
     setPreviewLabels(labelsToShow);
     setPreviewOpen(true);
-  }
-
-  function triggerPrint(labelsToUse: Label[]) {
-    setPrintQueue(labelsToUse);
   }
 
   // ── Render ───────────────────────────────────────────────────────────────
@@ -315,10 +245,10 @@ export default function App() {
         onClearAll={handleClearAll}
         onTogglePanel={() => setPanelOpen(p => !p)}
         onImport={() => setImportOpen(true)}
-        onExportExcel={handleExportExcel}
-        onExportWord={handleExportWord}
-        onExportCsv={handleExportCsv}
-        onExportPdf={handleExportPdf}
+        onExportExcel={exportToExcel}
+        onExportWord={exportToWord}
+        onExportCsv={exportToCsv}
+        onExportPdf={exportToPdf}
         onToggleSelection={toggleSelectionMode}
         onPreview={() => openPreview(filteredLabels)}
         onPrint={() => triggerPrint(filteredLabels)}
@@ -373,7 +303,7 @@ export default function App() {
           selectedIds={selectedIds}
           selectionMode={selectionMode}
           searchQuery={searchQuery}
-          onEdit={id => setEditTarget(labels.find(l => l.id === id) ?? null)}
+          onEdit={handleEdit}
           onDuplicate={handleDuplicate}
           onRemove={handleRemove}
           onReorder={reorder}
@@ -409,6 +339,7 @@ export default function App() {
 
       {editTarget !== undefined && (
         <EditModal
+          key={editTarget === null ? 'new' : editTarget.id}
           label={editTarget}
           onSave={handleSave}
           onClose={() => setEditTarget(undefined)}

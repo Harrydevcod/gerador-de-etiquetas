@@ -3,6 +3,7 @@ import type { Label } from '../types/label';
 import type { AppConfig } from '../types/config';
 import { SECTION_COLORS } from '../constants/sections';
 import { formatPrice } from '../renderers/helpers';
+import { cleanUnit } from './units';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -110,7 +111,7 @@ function renderLabel(
   // Row 4 — Unit
   merge(4);
   rowHeights[startRow + 4] = { hpt: cfg.fopts.showUnit && l.unit ? 13 : 4 };
-  setCell(ws, startRow + 4, startCol, cfg.fopts.showUnit && l.unit ? l.unit : '', {
+  setCell(ws, startRow + 4, startCol, cfg.fopts.showUnit && l.unit ? cleanUnit(l.unit) : '', {
     font: { sz: 8, color: { rgb: '888888' } },
     alignment: { vertical: 'center' },
     border: { left: thin, right: thin },
@@ -215,8 +216,7 @@ export async function exportExcel(labels: Label[], cfg: AppConfig): Promise<void
   const defaultName = `etiquetas_${new Date().toISOString().split('T')[0]}.xlsx`;
   const wbout: Uint8Array = XLSXStyle.write(wb, { bookType: 'xlsx', type: 'array' });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const api = (window as any).electronAPI;
+  const api = window.electronAPI;
   if (api?.saveExcelDialog) {
     const filePath: string | null = await api.saveExcelDialog(defaultName);
     if (!filePath) return;

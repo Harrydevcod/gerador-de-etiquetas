@@ -8,7 +8,7 @@ type UpdateState =
   | { phase: 'ready' }
   | { phase: 'error'; message: string };
 
-const api = (window as Window & { electronAPI?: { isElectron?: boolean; onUpdateAvailable?: (cb: (i: { version: string }) => void) => () => void; onUpdateProgress?: (cb: (i: { percent: number }) => void) => () => void; onUpdateDownloaded?: (cb: () => void) => () => void; onUpdateError?: (cb: (i: { message: string }) => void) => () => void; downloadUpdate?: () => void; installUpdate?: () => void } }).electronAPI;
+const api = window.electronAPI;
 
 export function UpdateBanner() {
   const [state, setState] = useState<UpdateState>({ phase: 'idle' });

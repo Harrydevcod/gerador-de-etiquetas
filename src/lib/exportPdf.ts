@@ -62,8 +62,11 @@ export async function exportPdf(labels: Label[], cfg: AppConfig): Promise<void> 
   await new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
 
   try {
+    // Escala adaptativa: a 2× muitas etiquetas geram um canvas enorme que
+    // congela a main thread. Baixa a resolução conforme o volume.
+    const scale = labels.length > 200 ? 1 : labels.length > 80 ? 1.5 : 2;
     const canvas = await html2canvas(container, {
-      scale: 2,
+      scale,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
@@ -92,6 +95,9 @@ export async function exportPdf(labels: Label[], cfg: AppConfig): Promise<void> 
     let firstPage = true;
 
     while (yMm < totalH_mm) {
+      // Cede a thread entre páginas para o spinner/UI respirarem (o
+      // toDataURL('png') por página é CPU-bound).
+      if (!firstPage) await new Promise<void>(r => setTimeout(r));
       if (!firstPage) pdf.addPage();
       firstPage = false;
 
@@ -115,8 +121,7 @@ export async function exportPdf(labels: Label[], cfg: AppConfig): Promise<void> 
 
     const fileName = `etiquetas_${new Date().toISOString().split('T')[0]}.pdf`;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const api = (window as any).electronAPI;
+    const api = window.electronAPI;
     if (api?.savePdfDialog) {
       const filePath: string | null = await api.savePdfDialog(fileName);
       if (!filePath) return;

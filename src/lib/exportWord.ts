@@ -4,6 +4,7 @@ import {
   ShadingType,
 } from 'docx';
 import type { Label } from '../types/label';
+import { cleanUnit } from './units';
 import type { AppConfig } from '../types/config';
 import { SECTION_COLORS } from '../constants/sections';
 import { formatPrice } from '../renderers/helpers';
@@ -54,7 +55,7 @@ function labelCell(l: Label, cfg: AppConfig): TableCell {
   // Unit
   if (cfg.fopts.showUnit && l.unit) {
     children.push(new Paragraph({
-      children: [new TextRun({ text: l.unit, size: 14, color: '888888' })],
+      children: [new TextRun({ text: cleanUnit(l.unit), size: 14, color: '888888' })],
       spacing: { before: 0, after: 20 },
     }));
   }
@@ -129,8 +130,7 @@ export async function exportWord(labels: Label[], cfg: AppConfig): Promise<void>
   const defaultName = `etiquetas_${new Date().toISOString().split('T')[0]}.docx`;
   const blob = await Packer.toBlob(doc);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const api = (window as any).electronAPI;
+  const api = window.electronAPI;
   if (api?.saveWordDialog) {
     const filePath: string | null = await api.saveWordDialog(defaultName);
     if (!filePath) return;

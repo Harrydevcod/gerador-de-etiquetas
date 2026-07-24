@@ -7,6 +7,23 @@ const fs = require('fs');
 const isDev = process.env.ELECTRON_DEV === 'true';
 const APP_VERSION = app.getVersion();
 
+// ── Allow-list de caminhos ───────────────────────────────────────────────────
+// O renderer só pode ler/escrever/abrir caminhos que o utilizador escolheu
+// explicitamente num diálogo nativo. Sem isto, qualquer path do renderer chegava
+// a fs/shell sem validação (superfície ampla atrás dos sinks de HTML).
+const dialogPaths = new Set();
+
+function allowPath(filePath) {
+  if (filePath) dialogPaths.add(path.resolve(String(filePath)));
+  return filePath;
+}
+
+function assertAllowed(filePath) {
+  const p = path.resolve(String(filePath || ''));
+  if (!dialogPaths.has(p)) throw new Error('Caminho não autorizado');
+  return p;
+}
+
 // ── Persistent window state ─────────────────────────────────────────────────
 const stateFile = path.join(app.getPath('userData'), 'window-state.json');
 
@@ -82,13 +99,13 @@ function registerIPC() {
       properties: ['openFile'],
     });
     if (canceled || !filePaths.length) return null;
-    return filePaths[0];
+    return allowPath(filePaths[0]);
   });
 
-  // Ler ficheiro do disco
+  // Ler ficheiro do disco (só caminhos escolhidos num diálogo)
   ipcMain.handle('fs:read-file', async (_event, filePath) => {
     try {
-      const buf = fs.readFileSync(filePath);
+      const buf = fs.readFileSync(assertAllowed(filePath));
       return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
     } catch (err) {
       throw new Error(`Não foi possível ler o ficheiro: ${err.message}`);
@@ -103,14 +120,14 @@ function registerIPC() {
       defaultPath: defaultName || 'etiquetas.xlsx',
       filters: [{ name: 'Excel', extensions: ['xlsx'] }],
     });
-    return canceled ? null : filePath;
+    return canceled ? null : allowPath(filePath);
   });
 
-  // Escrever ficheiro no disco
+  // Escrever ficheiro no disco (só caminhos escolhidos num diálogo)
   ipcMain.handle('fs:write-file', async (_event, filePath, data) => {
     try {
       const buf = Buffer.from(data);
-      fs.writeFileSync(filePath, buf);
+      fs.writeFileSync(assertAllowed(filePath), buf);
       return true;
     } catch (err) {
       throw new Error(`Não foi possível guardar: ${err.message}`);
@@ -125,17 +142,39 @@ function registerIPC() {
       defaultPath: defaultName || 'etiquetas.docx',
       filters: [{ name: 'Word', extensions: ['docx'] }],
     });
-    return canceled ? null : filePath;
+    return canceled ? null : allowPath(filePath);
   });
 
-  // Abrir pasta no explorador
+  // Diálogo guardar PDF
+  ipcMain.handle('dialog:save-pdf', async (event, defaultName) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const { canceled, filePath } = await dialog.showSaveDialog(win, {
+      title: 'Exportar PDF',
+      defaultPath: defaultName || 'etiquetas.pdf',
+      filters: [{ name: 'PDF', extensions: ['pdf'] }],
+    });
+    return canceled ? null : allowPath(filePath);
+  });
+
+  // Diálogo guardar CSV
+  ipcMain.handle('dialog:save-csv', async (event, defaultName) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const { canceled, filePath } = await dialog.showSaveDialog(win, {
+      title: 'Exportar CSV',
+      defaultPath: defaultName || 'etiquetas.csv',
+      filters: [{ name: 'CSV', extensions: ['csv'] }],
+    });
+    return canceled ? null : allowPath(filePath);
+  });
+
+  // Abrir pasta no explorador (só caminhos escolhidos num diálogo)
   ipcMain.handle('shell:show-item', (_event, filePath) => {
-    shell.showItemInFolder(filePath);
+    shell.showItemInFolder(assertAllowed(filePath));
   });
 
-  // Abrir ficheiro no programa padrão
+  // Abrir ficheiro no programa padrão (só caminhos escolhidos num diálogo)
   ipcMain.handle('shell:open-path', (_event, filePath) => {
-    return shell.openPath(filePath);
+    return shell.openPath(assertAllowed(filePath));
   });
 
   // Auto-updater

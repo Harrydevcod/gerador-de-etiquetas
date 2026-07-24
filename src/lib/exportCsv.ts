@@ -1,4 +1,5 @@
 import type { Label } from '../types/label';
+import { cleanUnit } from './units';
 
 export async function exportCsv(labels: Label[]): Promise<void> {
   const BOM = '﻿';
@@ -10,7 +11,7 @@ export async function exportCsv(labels: Label[]): Promise<void> {
     l.brand,
     l.price.toString(),
     l.oldPrice > 0 ? l.oldPrice.toString() : '',
-    l.unit,
+    cleanUnit(l.unit),
     l.section,
     l.store,
   ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(';'));
@@ -18,8 +19,7 @@ export async function exportCsv(labels: Label[]): Promise<void> {
   const csv = BOM + [headers.map(h => `"${h}"`).join(';'), ...rows].join('\r\n');
   const defaultName = `etiquetas_${new Date().toISOString().split('T')[0]}.csv`;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const api = (window as any).electronAPI;
+  const api = window.electronAPI;
   if (api?.saveCsvDialog) {
     const filePath: string | null = await api.saveCsvDialog(defaultName);
     if (!filePath) return;

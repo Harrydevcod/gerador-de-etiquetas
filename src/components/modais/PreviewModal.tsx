@@ -46,7 +46,9 @@ export function PreviewModal({ labels, cfg, onClose, onPrint }: Props) {
   const totalPages = pages.length;
   const marginPx = parseFloat(cfg.pmarg) * 37.8;
   const ribbonHtml = rbn(cfg);
-  const curLabels = pages[Math.min(page, totalPages - 1)] ?? [];
+  // Clamp derivado em render (evita sincronizar `page` via setState num effect).
+  const safePage = Math.max(0, Math.min(page, totalPages - 1));
+  const curLabels = pages[safePage] ?? [];
 
   const fitZoom = useCallback(() => {
     if (!mainRef.current) return;
@@ -60,10 +62,6 @@ export function PreviewModal({ labels, cfg, onClose, onPrint }: Props) {
     const t = setTimeout(fitZoom, 60);
     return () => clearTimeout(t);
   }, [fitZoom]);
-
-  useEffect(() => {
-    setPage(p => Math.min(p, Math.max(0, totalPages - 1)));
-  }, [totalPages]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -100,7 +98,7 @@ export function PreviewModal({ labels, cfg, onClose, onPrint }: Props) {
           Pré-visualização A4
         </span>
         <span className="text-xs tabular-nums" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          Pág. {page + 1}/{totalPages}
+          Pág. {safePage + 1}/{totalPages}
         </span>
 
         <div className="flex-1" />
@@ -238,7 +236,7 @@ export function PreviewModal({ labels, cfg, onClose, onPrint }: Props) {
         <div className="flex items-center justify-center gap-3 py-2">
           <button
             onClick={() => setPage(p => Math.max(0, p - 1))}
-            disabled={page === 0}
+            disabled={safePage === 0}
             className="p-1.5 rounded-lg transition-colors disabled:opacity-25"
             style={{ color: 'rgba(255,255,255,0.5)' }}
             title="Página anterior (←)"
@@ -254,9 +252,9 @@ export function PreviewModal({ labels, cfg, onClose, onPrint }: Props) {
                   onClick={() => setPage(i)}
                   className="rounded-full transition-all"
                   style={{
-                    width: i === page ? 16 : 8,
+                    width: i === safePage ? 16 : 8,
                     height: 8,
-                    background: i === page ? '#1a6fbd' : 'rgba(255,255,255,0.2)',
+                    background: i === safePage ? '#1a6fbd' : 'rgba(255,255,255,0.2)',
                     flexShrink: 0,
                   }}
                   title={`Página ${i + 1}`}
@@ -265,13 +263,13 @@ export function PreviewModal({ labels, cfg, onClose, onPrint }: Props) {
             </div>
           ) : (
             <span className="text-xs tabular-nums" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {page + 1} / {totalPages}
+              {safePage + 1} / {totalPages}
             </span>
           )}
 
           <button
             onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-            disabled={page === totalPages - 1}
+            disabled={safePage === totalPages - 1}
             className="p-1.5 rounded-lg transition-colors disabled:opacity-25"
             style={{ color: 'rgba(255,255,255,0.5)' }}
             title="Próxima página (→)"
@@ -296,10 +294,10 @@ export function PreviewModal({ labels, cfg, onClose, onPrint }: Props) {
                   height: Math.round(THUMB_W * (pageH / pageW)),
                   overflow: 'hidden',
                   background: 'white',
-                  outline: i === page
+                  outline: i === safePage
                     ? '2px solid #1a6fbd'
                     : '1px solid rgba(255,255,255,0.1)',
-                  outlineOffset: i === page ? 1 : 0,
+                  outlineOffset: i === safePage ? 1 : 0,
                   position: 'relative',
                   flexDirection: 'column',
                 }}

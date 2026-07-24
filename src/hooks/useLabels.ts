@@ -1,19 +1,31 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Label } from '../types/label';
+import { safeSetItem } from '../lib/storage';
+import { useToast } from '../lib/toast';
 
 const KEY = 'etq_labels_v2';
 export const LAST_SESSION_KEY = 'etq_last_session';
 const MAX_HISTORY = 50;
+const SCHEMA_VERSION = 1;
 
 function genErp(): string {
   return 'ERP-' + Math.floor(10000 + Math.random() * 90000);
+}
+
+// Aceita o formato legado (array cru) e o envelope versionado.
+function migrateLabels(parsed: unknown): Label[] {
+  if (Array.isArray(parsed)) return parsed as Label[]; // legado
+  if (parsed && typeof parsed === 'object' && 'data' in parsed) {
+    return (parsed as { data: Label[] }).data ?? [];
+  }
+  return [];
 }
 
 function load(): Label[] {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return [];
-    const labels = JSON.parse(raw) as Label[];
+    const labels = migrateLabels(JSON.parse(raw));
     if (labels.length > 0) {
       localStorage.setItem(LAST_SESSION_KEY, JSON.stringify({ savedAt: new Date().toISOString(), labels }));
       localStorage.removeItem(KEY);
@@ -25,13 +37,19 @@ function load(): Label[] {
 }
 
 export function useLabels() {
+  const { toast } = useToast();
   const [labels, setLabels]   = useState<Label[]>(load);
   const [past,   setPast]     = useState<Label[][]>([]);
   const [future, setFuture]   = useState<Label[][]>([]);
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(labels));
-  }, [labels]);
+    const res = safeSetItem(KEY, JSON.stringify({ v: SCHEMA_VERSION, data: labels }));
+    if (!res.ok) {
+      toast(res.quota
+        ? 'Armazenamento cheio — remova etiquetas ou reduza o logo para guardar.'
+        : 'Erro ao guardar as etiquetas.', 'error');
+    }
+  }, [labels, toast]);
 
   function add(data: Omit<Label, 'id' | 'createdAt'>): Label {
     const label: Label = {
@@ -87,12 +105,12 @@ export function useLabels() {
 
   function seedSamples(): void {
     const samples: Omit<Label, 'id' | 'createdAt'>[] = [
-      { c: '', name: 'Arroz agulha 5kg',      brand: 'Bom Sucesso', price: 850,  oldPrice: 950, unit: 'por fardo',  section: 'Mercearia', store: 'Minimarket' },
-      { c: '', name: 'Óleo alimentar 1L',      brand: 'Fula',        price: 295,  oldPrice: 0,   unit: 'por litro',  section: 'Mercearia', store: 'Minimarket' },
-      { c: '', name: 'Frango inteiro',          brand: '',            price: 450,  oldPrice: 520, unit: 'por kg',     section: 'Talho',     store: 'Minimarket' },
-      { c: '', name: 'Leite UHT 1L',            brand: 'Mimosa',      price: 180,  oldPrice: 0,   unit: 'por unid.',  section: 'Bebidas',   store: 'Minimarket' },
-      { c: '', name: 'Pão de forma integral',   brand: 'Panidor',     price: 220,  oldPrice: 250, unit: 'por unid.',  section: 'Padaria',   store: 'Minimarket' },
-      { c: '', name: 'Tomate cherry 500g',      brand: '',            price: 120,  oldPrice: 0,   unit: 'por 500g',   section: 'Frescos',   store: 'Minimarket' },
+      { c: '', name: 'Arroz agulha 5kg',      brand: 'Bom Sucesso', price: 850,  oldPrice: 950, unit: 'fardo',  section: 'Mercearia', store: 'Minimarket' },
+      { c: '', name: 'Óleo alimentar 1L',      brand: 'Fula',        price: 295,  oldPrice: 0,   unit: 'litro',  section: 'Mercearia', store: 'Minimarket' },
+      { c: '', name: 'Frango inteiro',          brand: '',            price: 450,  oldPrice: 520, unit: 'kg',     section: 'Talho',     store: 'Minimarket' },
+      { c: '', name: 'Leite UHT 1L',            brand: 'Mimosa',      price: 180,  oldPrice: 0,   unit: 'unid.',  section: 'Bebidas',   store: 'Minimarket' },
+      { c: '', name: 'Pão de forma integral',   brand: 'Panidor',     price: 220,  oldPrice: 250, unit: 'unid.',  section: 'Padaria',   store: 'Minimarket' },
+      { c: '', name: 'Tomate cherry 500g',      brand: '',            price: 120,  oldPrice: 0,   unit: '500g',   section: 'Frescos',   store: 'Minimarket' },
     ];
     setLabels(prev => {
       setPast(p => [...p.slice(-(MAX_HISTORY - 1)), prev]);

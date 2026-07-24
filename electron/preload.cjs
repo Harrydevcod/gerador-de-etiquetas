@@ -11,6 +11,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readFile: (filePath) => ipcRenderer.invoke('fs:read-file', filePath),
   saveExcelDialog: (defaultName) => ipcRenderer.invoke('dialog:save-excel', defaultName),
   saveWordDialog: (defaultName) => ipcRenderer.invoke('dialog:save-word', defaultName),
+  savePdfDialog: (defaultName) => ipcRenderer.invoke('dialog:save-pdf', defaultName),
+  saveCsvDialog: (defaultName) => ipcRenderer.invoke('dialog:save-csv', defaultName),
   writeFile: (filePath, data) => ipcRenderer.invoke('fs:write-file', filePath, data),
   showItemInFolder: (filePath) => ipcRenderer.invoke('shell:show-item', filePath),
   openPath: (filePath) => ipcRenderer.invoke('shell:open-path', filePath),
