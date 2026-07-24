@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import type { Label } from '../../types/label';
 import { SECTIONS } from '../../constants/sections';
 
-const UNITS = ['por unid.', 'por kg', 'por litro', 'por 500g', 'por fardo', 'por caixa', 'por par', 'por m²'];
+const UNITS = ['unid.', 'kg', 'litro', '500g', 'fardo', 'caixa', 'par', 'm²'];
 
 type FormData = Omit<Label, 'id' | 'createdAt'>;
 
@@ -14,7 +14,7 @@ interface Props {
 }
 
 function blank(): FormData {
-  return { c: '', name: '', brand: '', price: 0, oldPrice: 0, unit: 'por unid.', section: 'Mercearia', store: 'Minimarket' };
+  return { c: '', name: '', brand: '', price: 0, oldPrice: 0, unit: 'unid.', section: 'Mercearia', store: 'Minimarket' };
 }
 
 const inputCls = 'w-full px-3 py-2 text-sm bg-[var(--inp)] border border-[var(--bdr)] rounded-lg text-[var(--txt)] placeholder:text-[var(--txt3)] focus:outline-none focus:border-[var(--acc)] transition-colors';
@@ -24,10 +24,8 @@ export function EditModal({ label, onSave, onClose }: Props) {
   const [form, setForm] = useState<FormData>(label ? { c: label.c, name: label.name, brand: label.brand, price: label.price, oldPrice: label.oldPrice, unit: label.unit, section: label.section, store: label.store } : blank());
   const [qty, setQty] = useState(1);
 
-  useEffect(() => {
-    setForm(label ? { c: label.c, name: label.name, brand: label.brand, price: label.price, oldPrice: label.oldPrice, unit: label.unit, section: label.section, store: label.store } : blank());
-    setQty(1);
-  }, [label]);
+  // Form/qty inicializam do `label` no useState; o App remonta via `key` quando
+  // o alvo muda, por isso não é preciso sincronizar via effect.
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose(); }
@@ -97,7 +95,8 @@ export function EditModal({ label, onSave, onClose }: Props) {
             <div>
               <label className="block text-xs font-medium text-[var(--txt2)] mb-1">Secção</label>
               <select value={form.section} onChange={e => set('section', e.target.value)} className={inputCls}>
-                {SECTIONS.map(s => <option key={s}>{s}</option>)}
+                <option value="">— Nenhuma —</option>
+                {SECTIONS.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           </div>

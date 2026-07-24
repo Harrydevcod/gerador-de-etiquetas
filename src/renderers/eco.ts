@@ -1,7 +1,7 @@
 import type { Label } from '../types/label';
 import type { AppConfig, SizeKey } from '../types/config';
 import { SIZES } from '../constants/sizes';
-import { pB, ftH, brandLine, unitLine, secBadge, storeName, nameDiv } from './helpers';
+import { pB, ftH, brandLine, unitLine, secBadge, storeName, nameDiv, headerEmpty } from './helpers';
 
 export function eco(l: Label, sz: SizeKey, cfg: AppConfig): string {
   const s = SIZES[sz];
@@ -9,7 +9,7 @@ export function eco(l: Label, sz: SizeKey, cfg: AppConfig): string {
   const darkGreen = '#1e8449';
   const hdrH = Math.max(14, Math.round(s.h * 0.22));
 
-  const header = `<div style="background:${green};padding:2px 4px;display:flex;align-items:center;justify-content:space-between;height:${hdrH}px;gap:2px;overflow:hidden;flex-shrink:0">
+  const header = headerEmpty(l, cfg) ? '' : `<div style="background:${green};padding:2px 4px;display:flex;align-items:center;justify-content:space-between;height:${hdrH}px;gap:2px;overflow:hidden;flex-shrink:0">
     ${secBadge(l, sz, 'background:rgba(255,255,255,0.25);color:#fff', cfg)}
     ${storeName(l, sz, 'color:#fff', cfg)}
   </div>`;

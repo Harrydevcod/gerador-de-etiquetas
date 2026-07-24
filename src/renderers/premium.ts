@@ -1,7 +1,7 @@
 import type { Label } from '../types/label';
 import type { AppConfig, SizeKey } from '../types/config';
 import { SIZES } from '../constants/sizes';
-import { pB, ftH, brandLine, unitLine, secBadge, storeName, nameDiv } from './helpers';
+import { pB, ftH, brandLine, unitLine, secBadge, storeName, nameDiv, headerEmpty } from './helpers';
 
 export function premium(l: Label, sz: SizeKey, cfg: AppConfig): string {
   const s = SIZES[sz];
@@ -9,7 +9,7 @@ export function premium(l: Label, sz: SizeKey, cfg: AppConfig): string {
   const bg = '#0e0e0e';
   const hdrH = Math.max(14, Math.round(s.h * 0.22));
 
-  const header = `<div style="background:#181206;border-bottom:1px solid ${gold};padding:2px 5px;display:flex;align-items:center;justify-content:space-between;height:${hdrH}px;gap:2px;overflow:hidden;flex-shrink:0">
+  const header = headerEmpty(l, cfg) ? '' : `<div style="background:#181206;border-bottom:1px solid ${gold};padding:2px 5px;display:flex;align-items:center;justify-content:space-between;height:${hdrH}px;gap:2px;overflow:hidden;flex-shrink:0">
     ${secBadge(l, sz, `background:transparent;color:${gold};border:1px solid ${gold}40`, cfg)}
     ${storeName(l, sz, `color:${gold}`, cfg)}
   </div>`;

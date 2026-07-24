@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { X, Pencil, TrendingUp, TrendingDown, Equal, Plus, Minus } from 'lucide-react';
 import { SECTIONS } from '../../constants/sections';
+import { applyPriceOp } from '../../lib/priceOp';
+import type { PriceOpType, RoundTo, PriceOp } from '../../lib/priceOp';
 
-const UNITS = ['por unid.', 'por kg', 'por litro', 'por 500g', 'por fardo', 'por caixa', 'por par', 'por m²'];
+const UNITS = ['unid.', 'kg', 'litro', '500g', 'fardo', 'caixa', 'par', 'm²'];
 
 interface Fields {
   section: string;
@@ -11,15 +13,6 @@ interface Fields {
   brand: string;
 }
 type FieldKey = keyof Fields;
-
-type PriceOpType = 'percent_up' | 'percent_down' | 'fixed_set' | 'fixed_up' | 'fixed_down';
-type RoundTo = 1 | 10 | 50 | 100;
-
-export interface PriceOp {
-  type: PriceOpType;
-  value: number;
-  roundTo: RoundTo;
-}
 
 export interface BulkChanges extends Partial<Fields> {
   priceOp?: PriceOp;
@@ -33,8 +26,8 @@ interface Props {
 
 const inputCls = 'w-full px-3 py-2 text-sm bg-[var(--inp)] border border-[var(--bdr)] rounded-lg text-[var(--txt)] placeholder:text-[var(--txt3)] focus:outline-none focus:border-[var(--acc)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
 
-const FIELD_DEFS: { key: FieldKey; label: string; type: 'text' | 'select'; options?: string[] }[] = [
-  { key: 'section', label: 'Secção',  type: 'select', options: SECTIONS },
+const FIELD_DEFS: { key: FieldKey; label: string; type: 'text' | 'select'; options?: string[]; allowEmpty?: boolean }[] = [
+  { key: 'section', label: 'Secção',  type: 'select', options: SECTIONS, allowEmpty: true },
   { key: 'store',   label: 'Loja',    type: 'text' },
   { key: 'unit',    label: 'Unidade', type: 'select', options: UNITS },
   { key: 'brand',   label: 'Marca',   type: 'text' },
@@ -54,17 +47,6 @@ const ROUND_OPTS: { v: RoundTo; label: string }[] = [
   { v: 50,  label: '50$'  },
   { v: 100, label: '100$' },
 ];
-
-export function applyPriceOp(price: number, op: PriceOp): number {
-  let n = price;
-  if (op.type === 'percent_up')   n = price * (1 + op.value / 100);
-  if (op.type === 'percent_down') n = price * (1 - op.value / 100);
-  if (op.type === 'fixed_set')    n = op.value;
-  if (op.type === 'fixed_up')     n = price + op.value;
-  if (op.type === 'fixed_down')   n = price - op.value;
-  if (op.roundTo > 1) n = Math.round(n / op.roundTo) * op.roundTo;
-  return Math.max(1, Math.round(n));
-}
 
 function fmt(n: number) {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + '$';
@@ -137,7 +119,7 @@ export function BulkEditModal({ count, onApply, onClose }: Props) {
           <p className="text-xs text-[var(--txt3)]">Ativa os campos que queres alterar. Os desativados ficam inalterados.</p>
 
           {/* Text / select fields */}
-          {FIELD_DEFS.map(({ key, label, type, options }) => (
+          {FIELD_DEFS.map(({ key, label, type, options, allowEmpty }) => (
             <div key={key} className="flex items-center gap-3">
               <button
                 onClick={() => toggleField(key)}
@@ -153,7 +135,8 @@ export function BulkEditModal({ count, onApply, onClose }: Props) {
                 <label className="block text-xs font-medium text-[var(--txt2)] mb-1">{label}</label>
                 {type === 'select' ? (
                   <select value={values[key]} onChange={e => setValues(p => ({ ...p, [key]: e.target.value }))} disabled={!enabled[key]} className={inputCls}>
-                    {options!.map(o => <option key={o}>{o}</option>)}
+                    {allowEmpty && <option value="">— Nenhuma —</option>}
+                    {options!.map(o => <option key={o} value={o}>{o}</option>)}
                   </select>
                 ) : (
                   <input type="text" value={values[key]} onChange={e => setValues(p => ({ ...p, [key]: e.target.value }))} disabled={!enabled[key]} placeholder={`Nova ${label.toLowerCase()}…`} className={inputCls} />

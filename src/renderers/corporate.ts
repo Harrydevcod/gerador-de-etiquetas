@@ -1,14 +1,14 @@
 import type { Label } from '../types/label';
 import type { AppConfig, SizeKey } from '../types/config';
 import { SIZES } from '../constants/sizes';
-import { pB, ftH, brandLine, unitLine, secBadge, storeName, nameDiv } from './helpers';
+import { pB, ftH, brandLine, unitLine, secBadge, storeName, nameDiv, headerEmpty } from './helpers';
 
 export function corporate(l: Label, sz: SizeKey, cfg: AppConfig): string {
   const s = SIZES[sz];
   const navy = cfg.useCC ? cfg.customC : '#1e3a5f';
   const hdrH = Math.max(14, Math.round(s.h * 0.22));
 
-  const header = `<div style="background:${navy};padding:2px 5px;display:flex;align-items:center;justify-content:space-between;height:${hdrH}px;gap:2px;overflow:hidden;flex-shrink:0">
+  const header = headerEmpty(l, cfg) ? '' : `<div style="background:${navy};padding:2px 5px;display:flex;align-items:center;justify-content:space-between;height:${hdrH}px;gap:2px;overflow:hidden;flex-shrink:0">
     ${secBadge(l, sz, 'background:rgba(255,255,255,0.15);color:#d0dff5', cfg)}
     ${storeName(l, sz, 'color:#d0dff5', cfg)}
   </div>`;

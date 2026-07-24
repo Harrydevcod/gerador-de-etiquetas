@@ -2,13 +2,15 @@ import type { Label } from '../types/label';
 import type { AppConfig, SizeKey } from '../types/config';
 import { SIZES } from '../constants/sizes';
 import { code128Svg } from '../lib/barcode';
+import { cleanUnit } from '../lib/units';
 
 function esc(s: string): string {
   return String(s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 export function formatPrice(n: number): string {
@@ -82,7 +84,14 @@ export function unitLine(l: Label, sz: SizeKey, col: string, cfg: AppConfig): st
   // In very small sizes, unit competes with price — suppress it
   if (sz === 'XXXS' || sz === 'XXS') return '';
   const ta = cfg.nameAlign ?? 'left';
-  return `<div style="font-size:${fs(FS.unit, sz)}px;color:${col};margin-top:1px;text-align:${ta}">${esc(l.unit)}</div>`;
+  return `<div style="font-size:${fs(FS.unit, sz)}px;color:${col};margin-top:1px;text-align:${ta}">${esc(cleanUnit(l.unit))}</div>`;
+}
+
+// Header (secção + loja/logo) fica vazio? Espelha as guardas de secBadge/storeName.
+export function headerEmpty(l: Label, cfg: AppConfig): boolean {
+  const hasSec = cfg.fopts.showSec && !!l.section;
+  const hasStore = !!cfg.logoB64 || (cfg.fopts.showStore && !!l.store);
+  return !hasSec && !hasStore;
 }
 
 export function secBadge(l: Label, sz: SizeKey, style: string, cfg: AppConfig): string {

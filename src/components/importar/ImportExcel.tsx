@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import * as XLSX from 'xlsx';
 import { Upload, X, Check, AlertCircle, ChevronRight } from 'lucide-react';
 import type { Label } from '../../types/label';
 import { SECTIONS } from '../../constants/sections';
@@ -40,6 +39,9 @@ function autoDetect(headers: string[]): Partial<Record<FieldKey, string>> {
 }
 
 async function parseFile(file: File): Promise<{ headers: string[]; rows: Record<string, string>[] }> {
+  // SheetJS (via xlsx-js-style, o mesmo fork usado no export) carregado sob
+  // demanda — só quando o utilizador importa, fora do chunk inicial.
+  const XLSX = (await import('xlsx-js-style')).default;
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = e => {
@@ -104,7 +106,6 @@ export function ImportExcel({ onImport, onClose }: Props) {
     const file = e.dataTransfer.files[0];
     if (file) handleFile(file);
   // handleFile only closes over stable setState setters — safe to omit
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function setMap(field: FieldKey, col: string) {
@@ -128,9 +129,9 @@ export function ImportExcel({ onImport, onClose }: Props) {
         brand:    mapping.brand    ? String(row[mapping.brand]    ?? '').trim() : '',
         price,
         oldPrice: mapping.oldPrice ? parseInt(String(row[mapping.oldPrice]).replace(/\D/g, ''), 10) || 0 : 0,
-        unit:     mapping.unit     ? String(row[mapping.unit]     ?? '').trim() || 'por unid.' : 'por unid.',
-        section:  mapping.section  ? (SECTIONS.includes(String(row[mapping.section])) ? String(row[mapping.section]) : 'Mercearia') : 'Mercearia',
-        store:    mapping.store    ? String(row[mapping.store]    ?? '').trim() || 'Minimarket' : 'Minimarket',
+        unit:     mapping.unit     ? String(row[mapping.unit]     ?? '').trim() || 'unid.' : 'unid.',
+        section:  mapping.section && SECTIONS.includes(String(row[mapping.section])) ? String(row[mapping.section]) : '',
+        store:    mapping.store    ? String(row[mapping.store]    ?? '').trim() : '',
       });
     }
 
