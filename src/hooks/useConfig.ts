@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { AppConfig } from '../types/config';
 import { DEFAULT_CONFIG } from '../types/config';
+import { MODELS } from '../renderers';
+import { SIZES } from '../constants/sizes';
 import { safeSetItem } from '../lib/storage';
 import { useToast } from '../lib/toast';
 
@@ -18,12 +20,22 @@ function migrate(parsed: unknown): Partial<AppConfig> {
   return parsed as Partial<AppConfig>; // legado (pré-versionamento)
 }
 
+// Config guardada por outra versão (ou editada à mão) pode trazer um modelo/tamanho
+// que já não existe — vários consumidores fazem MODELS[k].label sem guarda.
+export function sanitizeConfig(data: Partial<AppConfig>): AppConfig {
+  const merged = { ...DEFAULT_CONFIG, ...data, fopts: { ...DEFAULT_CONFIG.fopts, ...data.fopts } };
+  return {
+    ...merged,
+    selModel: merged.selModel in MODELS ? merged.selModel : DEFAULT_CONFIG.selModel,
+    selSize: merged.selSize in SIZES ? merged.selSize : DEFAULT_CONFIG.selSize,
+  };
+}
+
 function load(): AppConfig {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return DEFAULT_CONFIG;
-    const data = migrate(JSON.parse(raw));
-    return { ...DEFAULT_CONFIG, ...data, fopts: { ...DEFAULT_CONFIG.fopts, ...data.fopts } };
+    return sanitizeConfig(migrate(JSON.parse(raw)));
   } catch {
     return DEFAULT_CONFIG;
   }
