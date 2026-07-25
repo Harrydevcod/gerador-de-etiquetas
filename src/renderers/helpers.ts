@@ -45,7 +45,9 @@ export function pB(l: Label, col: string, ps: number, cfg?: AppConfig): string {
   const ta = cfg?.nameAlign ?? 'left';
   const jc = ta === 'center' ? 'center' : ta === 'right' ? 'flex-end' : 'flex-start';
   const main = `<span style="font-size:${adjPs}px;font-weight:900;color:${col};line-height:1">${formatPrice(l.price)}</span>`;
-  if (l.oldPrice > 0) {
+  // Só risca o preço anterior se for realmente maior — caso contrário anunciava
+  // um desconto inexistente (e ficava incoerente com o badge do modelo Desconto).
+  if (l.oldPrice > l.price) {
     const old = `<span style="font-size:${Math.round(adjPs * 0.52)}px;color:#aaa;text-decoration:line-through;margin-right:2px">${formatPrice(l.oldPrice)}</span>`;
     return `<div style="display:flex;align-items:baseline;gap:1px;flex-wrap:wrap;justify-content:${jc}">${old}${main}</div>`;
   }

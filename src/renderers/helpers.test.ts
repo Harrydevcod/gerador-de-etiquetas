@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { headerEmpty } from './helpers';
+import { headerEmpty, pB } from './helpers';
 import { DEFAULT_CONFIG } from '../types/config';
 import type { Label } from '../types/label';
 import type { AppConfig } from '../types/config';
@@ -40,5 +40,26 @@ describe('headerEmpty', () => {
     const c = cfg();
     c.fopts = { ...c.fopts, showSec: false, showStore: false };
     expect(headerEmpty(label(), c)).toBe(true);
+  });
+});
+
+describe('pB — preço anterior riscado', () => {
+  const risca = (price: number, oldPrice: number) =>
+    pB(label({ price, oldPrice }), '#000', 20, cfg()).includes('line-through');
+
+  it('risca quando o preço anterior é maior (desconto real)', () => {
+    expect(risca(850, 950)).toBe(true);
+  });
+
+  it('não risca quando não há preço anterior', () => {
+    expect(risca(850, 0)).toBe(false);
+  });
+
+  it('não risca quando o preço anterior é igual (não é desconto)', () => {
+    expect(risca(850, 850)).toBe(false);
+  });
+
+  it('não risca quando o preço anterior é menor (seria anunciar aumento como desconto)', () => {
+    expect(risca(850, 700)).toBe(false);
   });
 });

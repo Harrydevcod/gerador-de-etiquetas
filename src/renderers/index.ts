@@ -10,6 +10,16 @@ import { neon }       from './neon';
 import { corporate }  from './corporate';
 import { bold }       from './bold';
 import { farmacia }   from './farmacia';
+import { talho }      from './talho';
+import { kraft }      from './kraft';
+import { desconto }   from './desconto';
+import { boutique }   from './boutique';
+import { tech }       from './tech';
+import { split }      from './split';
+import { peixaria }   from './peixaria';
+import { padaria }    from './padaria';
+import { infantil }   from './infantil';
+import { atacado }    from './atacado';
 
 export const MODELS: Record<ModelKey, { label: string; fn: (l: Label, sz: SizeKey, cfg: AppConfig) => string }> = {
   classico:  { label: 'Clássico',   fn: classico  },
@@ -22,6 +32,16 @@ export const MODELS: Record<ModelKey, { label: string; fn: (l: Label, sz: SizeKe
   corporate: { label: 'Corporate',  fn: corporate },
   bold:      { label: 'Bold',       fn: bold      },
   farmacia:  { label: 'Farmácia',   fn: farmacia  },
+  talho:     { label: 'Talho',      fn: talho     },
+  kraft:     { label: 'Kraft',      fn: kraft     },
+  desconto:  { label: 'Desconto',   fn: desconto  },
+  boutique:  { label: 'Boutique',   fn: boutique  },
+  tech:      { label: 'Tech',       fn: tech      },
+  split:     { label: 'Split',      fn: split     },
+  peixaria:  { label: 'Peixaria',   fn: peixaria  },
+  padaria:   { label: 'Padaria',    fn: padaria   },
+  infantil:  { label: 'Infantil',   fn: infantil  },
+  atacado:   { label: 'Atacado',    fn: atacado   },
 };
 
 export function renderLabel(l: Label, sz: SizeKey, cfg: AppConfig): string {
