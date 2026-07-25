@@ -14,7 +14,7 @@ import { LastSessionBanner } from './components/LastSessionBanner';
 import { useExport } from './hooks/useExport';
 import { usePrint } from './hooks/usePrint';
 import { renderLabel } from './renderers';
-import { ModelSizeBar } from './components/toolbar/ModelSizeBar';
+import { ModelBar } from './components/toolbar/ModelSizeBar';
 import { useToast } from './lib/toast';
 import { ShortcutsModal } from './components/modais/ShortcutsModal';
 import { UpdateBanner } from './components/UpdateBanner';
@@ -241,6 +241,7 @@ export default function App() {
         onAddNew={() => setEditTarget(null)}
         onToggleDark={() => setConfig({ dark: !cfg.dark })}
         onSetModel={(m: ModelKey) => setConfig({ selModel: m })}
+        onSetSize={(s) => setConfig({ selSize: s })}
         onSeed={handleSeed}
         onClearAll={handleClearAll}
         onTogglePanel={() => setPanelOpen(p => !p)}
@@ -254,11 +255,9 @@ export default function App() {
         onPrint={() => triggerPrint(filteredLabels)}
       />
 
-      <ModelSizeBar
+      <ModelBar
         selModel={cfg.selModel}
-        selSize={cfg.selSize}
         onSetModel={(m) => setConfig({ selModel: m })}
-        onSetSize={(s) => setConfig({ selSize: s })}
       />
 
       {labels.length > 0 && (

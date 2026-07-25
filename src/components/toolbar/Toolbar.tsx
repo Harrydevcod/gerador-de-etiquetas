@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Plus, Moon, Sun, Tag, Trash2, SlidersHorizontal, Upload, Download, FileSpreadsheet, FileText, Eye, Printer, CheckSquare, Square, Loader2, FileDown, FileImage, LayoutGrid, ChevronDown } from 'lucide-react';
-import type { AppConfig, ModelKey } from '../../types/config';
+import type { AppConfig, ModelKey, SizeKey } from '../../types/config';
 import { MODELS } from '../../renderers';
 import { ModelPickerModal } from '../modais/ModelPickerModal';
+import { SizeBar } from './ModelSizeBar';
 
 interface Props {
   cfg: AppConfig;
@@ -13,6 +14,7 @@ interface Props {
   onAddNew: () => void;
   onToggleDark: () => void;
   onSetModel: (m: ModelKey) => void;
+  onSetSize: (s: SizeKey) => void;
   onSeed: () => void;
   onClearAll: () => void;
   onTogglePanel: () => void;
@@ -29,7 +31,7 @@ interface Props {
 const selCls = 'text-xs px-2 py-1.5 bg-[var(--bg3)] border border-[var(--bdr)] rounded-lg text-[var(--txt)] focus:outline-none focus:border-[var(--acc)] cursor-pointer transition-colors hover:border-[var(--bdr2)]';
 const iconBtn = 'p-1.5 rounded-lg transition-colors text-[var(--txt2)] hover:bg-[var(--bg3)]';
 
-export function Toolbar({ cfg, labelCount, panelOpen, selectionMode, isLoading, onAddNew, onToggleDark, onSetModel, onSeed, onClearAll, onTogglePanel, onImport, onExportExcel, onExportWord, onExportCsv, onExportPdf, onToggleSelection, onPreview, onPrint }: Props) {
+export function Toolbar({ cfg, labelCount, panelOpen, selectionMode, isLoading, onAddNew, onToggleDark, onSetModel, onSetSize, onSeed, onClearAll, onTogglePanel, onImport, onExportExcel, onExportWord, onExportCsv, onExportPdf, onToggleSelection, onPreview, onPrint }: Props) {
   const [exportOpen, setExportOpen] = useState(false);
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
@@ -77,6 +79,9 @@ export function Toolbar({ cfg, labelCount, panelOpen, selectionMode, isLoading, 
           onClose={() => setModelPickerOpen(false)}
         />
       )}
+
+      {/* Tamanho */}
+      <SizeBar selModel={cfg.selModel} selSize={cfg.selSize} onSetSize={onSetSize} />
 
       <div className="flex-1" />
 
