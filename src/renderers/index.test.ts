@@ -7,6 +7,7 @@ import { MODELS } from './index';
 
 const ALL_MODEL_KEYS = [
   'classico',
+  'minimercado',
   'premium',
   'minimal',
   'promo',
@@ -26,10 +27,10 @@ const ALL_MODEL_KEYS = [
   'padaria',
   'infantil',
   'atacado',
-  'minimercado',
 ] as const satisfies readonly ModelKey[];
 
 const NEW_MODEL_KEYS = [
+  'minimercado',
   'talho',
   'kraft',
   'desconto',
@@ -40,7 +41,6 @@ const NEW_MODEL_KEYS = [
   'padaria',
   'infantil',
   'atacado',
-  'minimercado',
 ] as const satisfies readonly ModelKey[];
 
 const SIZE_KEYS = Object.keys(SIZES) as SizeKey[];

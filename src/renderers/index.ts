@@ -24,6 +24,7 @@ import { minimercado } from './minimercado';
 
 export const MODELS: Record<ModelKey, { label: string; fn: (l: Label, sz: SizeKey, cfg: AppConfig) => string }> = {
   classico:  { label: 'Clássico',   fn: classico  },
+  minimercado: { label: 'Minimercado', fn: minimercado },
   premium:   { label: 'Premium',    fn: premium   },
   minimal:   { label: 'Minimal',    fn: minimal   },
   promo:     { label: 'Promoção',   fn: promo     },
@@ -43,7 +44,6 @@ export const MODELS: Record<ModelKey, { label: string; fn: (l: Label, sz: SizeKe
   padaria:   { label: 'Padaria',    fn: padaria   },
   infantil:  { label: 'Infantil',   fn: infantil  },
   atacado:   { label: 'Atacado',    fn: atacado   },
-  minimercado: { label: 'Minimercado', fn: minimercado },
 };
 
 export function renderLabel(l: Label, sz: SizeKey, cfg: AppConfig): string {
