@@ -120,7 +120,7 @@ export function ModelPickerModal({ current, onSelect, onClose }: Props) {
               value={query}
               onChange={e => setQuery(e.target.value)}
               aria-label="Pesquisar modelos"
-              placeholder="Pesquisar entre 20 modelos"
+              placeholder={`Pesquisar entre ${modelEntries.length} modelos`}
               className="w-full rounded-xl border border-[var(--bdr)] bg-[var(--bg3)] py-2 pl-9 pr-3 text-sm text-[var(--txt)] outline-none transition-colors placeholder:text-[var(--txt3)] focus:border-[var(--acc)]"
             />
           </label>

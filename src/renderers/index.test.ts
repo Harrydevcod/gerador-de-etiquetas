@@ -26,6 +26,7 @@ const ALL_MODEL_KEYS = [
   'padaria',
   'infantil',
   'atacado',
+  'minimercado',
 ] as const satisfies readonly ModelKey[];
 
 const NEW_MODEL_KEYS = [
@@ -39,6 +40,7 @@ const NEW_MODEL_KEYS = [
   'padaria',
   'infantil',
   'atacado',
+  'minimercado',
 ] as const satisfies readonly ModelKey[];
 
 const SIZE_KEYS = Object.keys(SIZES) as SizeKey[];
@@ -68,7 +70,7 @@ function config(overrides: Partial<AppConfig> = {}): AppConfig {
 }
 
 describe('MODELS', () => {
-  it('registers exactly the supported 20 models', () => {
+  it('regista exatamente os modelos suportados', () => {
     expect(Object.keys(MODELS)).toEqual([...ALL_MODEL_KEYS]);
   });
 

@@ -1,7 +1,7 @@
 export type SizeKey = 'XXXS' | 'XXS' | 'XS' | 'S' | 'M' | 'L' | 'XL';
 export type ModelKey = 'classico' | 'premium' | 'minimal' | 'promo' | 'eco' | 'retro' | 'neon' | 'corporate' | 'bold' | 'farmacia'
   | 'talho' | 'kraft' | 'desconto' | 'boutique' | 'tech' | 'split'
-  | 'peixaria' | 'padaria' | 'infantil' | 'atacado';
+  | 'peixaria' | 'padaria' | 'infantil' | 'atacado' | 'minimercado';
 export type FontKey = 'sans' | 'cond' | 'serif' | 'mono';
 export type MarginKey = '0' | '0.3' | '0.5' | '1';
 export type NameAlign = 'left' | 'center' | 'right';
