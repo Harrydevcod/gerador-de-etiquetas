@@ -1,7 +1,7 @@
 {
   "name": "etiquetas",
   "private": true,
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "NOVA-ERP Etiquetas — gerador de etiquetas de preço para retalho",
   "author": "NOVA-ERP <arydsonmota@gmail.com>",
   "type": "module",
