@@ -62,7 +62,7 @@ Preserve them. Add characterization tests before correcting any renderer. If
 a characterization exposes a defect, add a focused failing regression test
 for that defect before changing production code.
 
-- [ ] **Step 1: Write registry and renderer characterization tests**
+- [x] **Step 1: Write registry and renderer characterization tests**
 
 Create `src/renderers/index.test.ts`:
 
@@ -209,7 +209,7 @@ describe('MODELS', () => {
 });
 ```
 
-- [ ] **Step 2: Run the characterization suite**
+- [x] **Step 2: Run the characterization suite**
 
 Run:
 
@@ -220,7 +220,7 @@ npm.cmd test -- src/renderers/index.test.ts
 Expected: the registry and inherited renderers satisfy the tests. A failure is
 evidence of a real integration defect, not permission to weaken an assertion.
 
-- [ ] **Step 3: Fix only demonstrated renderer defects**
+- [x] **Step 3: Fix only demonstrated renderer defects**
 
 If Step 2 exposes a defect, add one narrower `it(...)` case that reproduces
 the exact failure, run it to observe the failure, then correct the responsible
@@ -237,7 +237,7 @@ ${secBadge(label, size, badgeStyle, config)}
 ${storeName(label, size, storeStyle, config)}
 ```
 
-- [ ] **Step 4: Run renderer and existing tests**
+- [x] **Step 4: Run renderer and existing tests**
 
 Run:
 
@@ -247,7 +247,7 @@ npm.cmd test
 
 Expected: all existing and new tests pass.
 
-- [ ] **Step 5: Commit the model expansion**
+- [x] **Step 5: Commit the model expansion**
 
 Run:
 
@@ -278,7 +278,7 @@ git commit -m "feat(models): add ten retail label designs"
   `normalizeModelQuery(value: string): string` and
   `matchesModelQuery(label: string, query: string): boolean`.
 
-- [ ] **Step 1: Write the failing search tests**
+- [x] **Step 1: Write the failing search tests**
 
 Create `src/components/modais/modelPickerSearch.test.ts`:
 
@@ -314,7 +314,7 @@ describe('matchesModelQuery', () => {
 });
 ```
 
-- [ ] **Step 2: Run the search test and verify RED**
+- [x] **Step 2: Run the search test and verify RED**
 
 Run:
 
@@ -324,7 +324,7 @@ npm.cmd test -- src/components/modais/modelPickerSearch.test.ts
 
 Expected: FAIL because `modelPickerSearch.ts` doesn't exist.
 
-- [ ] **Step 3: Implement the minimal pure search logic**
+- [x] **Step 3: Implement the minimal pure search logic**
 
 Create `src/components/modais/modelPickerSearch.ts`:
 
@@ -342,7 +342,7 @@ export function matchesModelQuery(label: string, query: string): boolean {
 }
 ```
 
-- [ ] **Step 4: Run the search tests and verify GREEN**
+- [x] **Step 4: Run the search tests and verify GREEN**
 
 Run:
 
@@ -352,7 +352,7 @@ npm.cmd test -- src/components/modais/modelPickerSearch.test.ts
 
 Expected: 4 tests pass.
 
-- [ ] **Step 5: Commit the discovery logic**
+- [x] **Step 5: Commit the discovery logic**
 
 Run:
 
@@ -379,7 +379,7 @@ git commit -m "feat(models): add accent-insensitive model search"
 - Produces: a modal dialog with search, responsive scrolling, accessible
   selection state, focus entry, and focus restoration.
 
-- [ ] **Step 1: Enable TSX component tests**
+- [x] **Step 1: Enable TSX component tests**
 
 Change `vitest.config.ts` to include both TypeScript test extensions:
 
@@ -395,7 +395,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 2: Write the failing server-rendered accessibility contract**
+- [x] **Step 2: Write the failing server-rendered accessibility contract**
 
 Create `src/components/modais/ModelPickerModal.test.tsx`:
 
@@ -426,7 +426,7 @@ describe('ModelPickerModal', () => {
 });
 ```
 
-- [ ] **Step 3: Run the component test and verify RED**
+- [x] **Step 3: Run the component test and verify RED**
 
 Run:
 
@@ -437,7 +437,7 @@ npm.cmd test -- src/components/modais/ModelPickerModal.test.tsx
 Expected: FAIL because the current picker has no dialog semantics, search
 field, accessible close name, or selected-state attribute.
 
-- [ ] **Step 4: Implement search state and focus behavior**
+- [x] **Step 4: Implement search state and focus behavior**
 
 Update imports and component state in
 `src/components/modais/ModelPickerModal.tsx`:
@@ -486,7 +486,7 @@ useEffect(() => {
 Keep the existing Escape listener in a separate effect so its cleanup remains
 independent.
 
-- [ ] **Step 5: Implement the responsive dialog shell**
+- [x] **Step 5: Implement the responsive dialog shell**
 
 Use this structure for the backdrop and panel:
 
@@ -518,7 +518,7 @@ Give the title `id="model-picker-title"` and the close button:
 aria-label="Fechar seletor de modelos"
 ```
 
-- [ ] **Step 6: Add the search field, empty state, and responsive grid**
+- [x] **Step 6: Add the search field, empty state, and responsive grid**
 
 Add the search control below the dialog title:
 
@@ -576,7 +576,7 @@ When `filteredModels.length === 0`, render:
 </div>
 ```
 
-- [ ] **Step 7: Run focused tests and verify GREEN**
+- [x] **Step 7: Run focused tests and verify GREEN**
 
 Run:
 
@@ -587,7 +587,7 @@ npm.cmd test -- src/components/modais/modelPickerSearch.test.ts `
 
 Expected: all focused tests pass.
 
-- [ ] **Step 8: Run the full automated gate**
+- [x] **Step 8: Run the full automated gate**
 
 Run:
 
@@ -601,7 +601,7 @@ git diff --check
 Expected: tests, lint, build, and whitespace checks pass. The existing Vite
 dependency deprecation warnings may remain; no new warning may be introduced.
 
-- [ ] **Step 9: Commit the picker**
+- [x] **Step 9: Commit the picker**
 
 Run:
 
@@ -649,7 +649,7 @@ git commit -m "feat(models): improve model picker discovery"
 - Produces: visual evidence that model discovery, label legibility, preview,
   and print composition remain usable.
 
-- [ ] **Step 1: Start the development server**
+- [x] **Step 1: Start the development server**
 
 Run:
 
@@ -659,7 +659,7 @@ npm.cmd run dev -- --host 127.0.0.1
 
 Expected: Vite reports a local URL without compilation errors.
 
-- [ ] **Step 2: Inspect the picker at desktop width**
+- [x] **Step 2: Inspect the picker at desktop width**
 
 At a viewport near `1440 × 1000`:
 
@@ -672,7 +672,7 @@ At a viewport near `1440 × 1000`:
 7. Close with Escape, reopen, close with the close button, and close through
    the backdrop.
 
-- [ ] **Step 3: Inspect the picker at narrow width**
+- [x] **Step 3: Inspect the picker at narrow width**
 
 At a viewport near `390 × 844`:
 
@@ -682,7 +682,7 @@ At a viewport near `390 × 844`:
 4. Navigate controls with Tab and confirm focus is visible.
 5. Close the picker and confirm focus returns to the model trigger.
 
-- [ ] **Step 4: Inspect representative renderer extremes**
+- [x] **Step 4: Inspect representative renderer extremes**
 
 For Talho, Desconto, Boutique, Tech, Split, and Infantil:
 
@@ -693,7 +693,7 @@ For Talho, Desconto, Boutique, Tech, Split, and Infantil:
 5. Add a two-line ribbon and confirm it doesn't cover the price.
 6. Use long label values and confirm no content escapes the root.
 
-- [ ] **Step 5: Inspect A4 preview integration**
+- [x] **Step 5: Inspect A4 preview integration**
 
 1. Select a new model and open **Pré-visualização A4**.
 2. Confirm page count, zoom, thumbnails, and navigation.
@@ -701,7 +701,7 @@ For Talho, Desconto, Boutique, Tech, Split, and Infantil:
 4. Confirm configured columns and margins match the preview.
 5. Trigger print and confirm the print queue uses the selected model.
 
-- [ ] **Step 6: Correct only observed defects through regression tests**
+- [x] **Step 6: Correct only observed defects through regression tests**
 
 For each observed renderer defect:
 
@@ -713,7 +713,7 @@ For each observed renderer defect:
 For a picker-only layout defect, apply the smallest class or layout correction
 and repeat both viewport inspections.
 
-- [ ] **Step 7: Commit visual corrections when needed**
+- [x] **Step 7: Commit visual corrections when needed**
 
 If files changed during inspection:
 
@@ -745,7 +745,7 @@ If no file changed, don't create an empty commit.
 - Produces: a clean, reviewed working tree containing only intentional
   changes and a commit sequence suitable for release.
 
-- [ ] **Step 1: Run all automated checks from a clean process**
+- [x] **Step 1: Run all automated checks from a clean process**
 
 Run:
 
@@ -763,7 +763,7 @@ Expected:
 - TypeScript and Vite production build complete.
 - `git diff --check` reports no whitespace errors.
 
-- [ ] **Step 2: Review the final change set**
+- [x] **Step 2: Review the final change set**
 
 Run:
 
@@ -780,7 +780,7 @@ Confirm that:
 - The ten new renderers, tests, search logic, and picker changes are present.
 - The design and plan documents remain committed.
 
-- [ ] **Step 3: Record verification evidence**
+- [x] **Step 3: Record verification evidence**
 
 Report:
 
