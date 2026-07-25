@@ -167,7 +167,11 @@ export function SizeBar({ selModel, selSize, onSetSize }: SizeBarProps) {
     <>
       {/* ponytail: flex-shrink-0 como os restantes controlos da header — em ecrãs
           estreitos rola com ela, em vez de encolher até desaparecer. */}
-      <div className="flex flex-shrink-0 items-center gap-0.5 rounded-lg border border-[var(--bdr)] bg-[var(--bg3)] p-0.5">
+      <div className="flex flex-shrink-0 items-center gap-1.5">
+      <span className="text-[10px] font-semibold text-[var(--txt3)] uppercase tracking-wider">
+        Tamanho
+      </span>
+      <div className="flex items-center gap-0.5 rounded-lg border border-[var(--bdr)] bg-[var(--bg3)] p-0.5">
         {(Object.entries(SIZES) as [SizeKey, { label: string }][]).map(([k, v]) => {
           const cm = v.label.split(' — ')[1];
           const active = selSize === k;
@@ -191,6 +195,7 @@ export function SizeBar({ selModel, selSize, onSetSize }: SizeBarProps) {
             </button>
           );
         })}
+        </div>
       </div>
 
       {tip && render(
