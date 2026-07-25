@@ -149,11 +149,11 @@ export function ModelSizeBar({ selModel, selSize, onSetModel, onSetSize }: Props
     <>
       <div className="no-print sticky top-[45px] z-20 flex items-center gap-0 bg-[var(--bg2)] border-b border-[var(--bdr)] px-4 py-1.5 overflow-x-auto scrollbar-none">
 
-        {/* Modelos */}
+        {/* Modelos — com 20 modelos só esta faixa rola; o tamanho fica sempre visível */}
         <span className="text-[10px] font-semibold text-[var(--txt3)] uppercase tracking-wider mr-2 flex-shrink-0">
           Modelo
         </span>
-        <div className="flex items-center gap-0.5 mr-4">
+        <div className="flex flex-1 min-w-[160px] items-center gap-0.5 mr-4 overflow-x-auto scrollbar-none">
           {(Object.entries(MODELS) as [ModelKey, { label: string }][]).map(([k, v]) => (
             <button
               key={k}
@@ -173,7 +173,7 @@ export function ModelSizeBar({ selModel, selSize, onSetModel, onSetSize }: Props
         <span className="text-[10px] font-semibold text-[var(--txt3)] uppercase tracking-wider mr-2 flex-shrink-0">
           Tamanho
         </span>
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-0.5 flex-shrink-0">
           {(Object.entries(SIZES) as [SizeKey, { label: string }][]).map(([k, v]) => {
             const cm = v.label.split(' — ')[1];
             const active = selSize === k;
