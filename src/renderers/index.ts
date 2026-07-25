@@ -21,6 +21,9 @@ import { padaria }    from './padaria';
 import { infantil }   from './infantil';
 import { atacado }    from './atacado';
 import { minimercado } from './minimercado';
+import { drogaria }   from './drogaria';
+import { papelaria }  from './papelaria';
+import { bebidas }    from './bebidas';
 
 export const MODELS: Record<ModelKey, { label: string; fn: (l: Label, sz: SizeKey, cfg: AppConfig) => string }> = {
   classico:  { label: 'Clássico',   fn: classico  },
@@ -44,6 +47,9 @@ export const MODELS: Record<ModelKey, { label: string; fn: (l: Label, sz: SizeKe
   padaria:   { label: 'Padaria',    fn: padaria   },
   infantil:  { label: 'Infantil',   fn: infantil  },
   atacado:   { label: 'Atacado',    fn: atacado   },
+  drogaria:  { label: 'Drogaria',   fn: drogaria  },
+  papelaria: { label: 'Papelaria',  fn: papelaria },
+  bebidas:   { label: 'Bebidas',    fn: bebidas   },
 };
 
 export function renderLabel(l: Label, sz: SizeKey, cfg: AppConfig): string {

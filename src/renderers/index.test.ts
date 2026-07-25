@@ -27,10 +27,16 @@ const ALL_MODEL_KEYS = [
   'padaria',
   'infantil',
   'atacado',
+  'drogaria',
+  'papelaria',
+  'bebidas',
 ] as const satisfies readonly ModelKey[];
 
 const NEW_MODEL_KEYS = [
   'minimercado',
+  'drogaria',
+  'papelaria',
+  'bebidas',
   'talho',
   'kraft',
   'desconto',

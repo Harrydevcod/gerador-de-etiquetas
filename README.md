@@ -5,10 +5,11 @@ Windows (Electron) com atualização automática.
 
 ## O que faz
 
-- **21 modelos** de etiqueta (Clássico, Premium, Minimal, Promoção, Eco, Retro,
-  Neon, Corporate, Bold, Farmácia, Talho, Kraft, Desconto, Boutique, Tech,
-  Split, Peixaria, Padaria, Infantil, Atacado, Minimercado) × **7 tamanhos** de
-  XXXS (3×2 cm) a XL (13×8 cm).
+- **24 modelos** de etiqueta (Clássico, Minimercado, Premium, Minimal, Promoção,
+  Eco, Retro, Neon, Corporate, Bold, Farmácia, Talho, Kraft, Desconto, Boutique,
+  Tech, Split, Peixaria, Padaria, Infantil, Atacado, Drogaria, Papelaria,
+  Bebidas) × **7 tamanhos** de XXXS (3×2 cm) a XL (13×8 cm). A linha de modelos
+  mostra os que cabem; **Mais modelos** abre o seletor completo com pesquisa.
 - **Importação de Excel/CSV** com deteção automática de colunas (`produto`,
   `preço`, `marca`, `secção`, `cod erp`…) e mapeamento manual antes de importar.
 - **Personalização**: fonte, cor de destaque, logótipo, faixa (ribbon), alinhamento

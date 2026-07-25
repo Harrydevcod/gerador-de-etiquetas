@@ -1,9 +1,11 @@
 import { useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { ChevronDown } from 'lucide-react';
 import type { ModelKey, SizeKey } from '../../types/config';
 import { DEFAULT_CONFIG } from '../../types/config';
 import { MODELS } from '../../renderers';
 import { SIZES } from '../../constants/sizes';
+import { ModelPickerModal } from '../modais/ModelPickerModal';
 import type { Label } from '../../types/label';
 
 const PREVIEW_LABEL: Label = {
@@ -112,14 +114,15 @@ interface ModelBarProps {
 
 export function ModelBar({ selModel, onSetModel }: ModelBarProps) {
   const { tip, show, hide, render } = useHoverTip<ModelKey>();
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   return (
     <>
-      <div className="no-print sticky top-[45px] z-20 flex items-center gap-0 bg-[var(--bg2)] border-b border-[var(--bdr)] px-4 py-1.5 overflow-x-auto scrollbar-none">
+      <div className="no-print sticky top-[45px] z-20 flex items-center gap-0 bg-[var(--bg2)] border-b border-[var(--bdr)] px-4 py-1.5">
         <span className="text-[10px] font-semibold text-[var(--txt3)] uppercase tracking-wider mr-2 flex-shrink-0">
           Modelo
         </span>
-        <div className="flex items-center gap-0.5">
+        <div className="flex flex-1 min-w-0 items-center gap-0.5 overflow-x-auto scrollbar-none">
           {(Object.entries(MODELS) as [ModelKey, { label: string }][]).map(([k, v]) => (
             <button
               key={k}
@@ -132,7 +135,25 @@ export function ModelBar({ selModel, onSetModel }: ModelBarProps) {
             </button>
           ))}
         </div>
+
+        {/* Fim da linha: o resto dos modelos vive no seletor, que já tem pesquisa
+            e pré-visualização — não vale um segundo menu só com os que sobraram. */}
+        <button
+          onClick={() => setPickerOpen(true)}
+          className="ml-2 flex flex-shrink-0 items-center gap-1 rounded-md border border-[var(--bdr)] px-2 py-1 text-[11px] font-medium text-[var(--txt2)] transition-colors hover:border-[var(--acc)]/50 hover:bg-[var(--bg3)] hover:text-[var(--txt)]"
+        >
+          Mais modelos
+          <ChevronDown size={11} className="text-[var(--txt3)]" />
+        </button>
       </div>
+
+      {pickerOpen && (
+        <ModelPickerModal
+          current={selModel}
+          onSelect={onSetModel}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
 
       {tip && render(
         <TipShell
