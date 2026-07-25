@@ -62,15 +62,20 @@ export function Toolbar({ cfg, labelCount, panelOpen, selectionMode, isLoading, 
       <div className="w-px h-5 bg-[var(--bdr)] mx-1 flex-shrink-0" />
 
       {/* Modelo */}
-      <button
-        onClick={() => setModelPickerOpen(true)}
-        className={`${selCls} flex items-center gap-1.5`}
-        title="Escolher modelo"
-      >
-        <LayoutGrid size={11} className="text-[var(--acc)] flex-shrink-0" />
-        <span className="hidden sm:inline">{MODELS[cfg.selModel].label}</span>
-        <ChevronDown size={10} className="text-[var(--txt3)] flex-shrink-0" />
-      </button>
+      <div className="flex flex-shrink-0 items-center gap-1.5">
+        <span className="text-[10px] font-semibold text-[var(--txt3)] uppercase tracking-wider">
+          Modelo
+        </span>
+        <button
+          onClick={() => setModelPickerOpen(true)}
+          className={`${selCls} flex items-center gap-1.5`}
+          title="Escolher modelo"
+        >
+          <LayoutGrid size={11} className="text-[var(--acc)] flex-shrink-0" />
+          <span className="hidden sm:inline">{MODELS[cfg.selModel].label}</span>
+          <ChevronDown size={10} className="text-[var(--txt3)] flex-shrink-0" />
+        </button>
+      </div>
 
       {modelPickerOpen && (
         <ModelPickerModal
